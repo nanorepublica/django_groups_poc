@@ -1,4 +1,4 @@
-from django.auth.backends import ModelBackend
+from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.db.models import Exists, OuterRef, Q
@@ -37,6 +37,6 @@ class MyModelBackend(ModelBackend):
         if include_superusers:
             user_q |= Q(groups__name='is_superuser')
         if is_active is not None:
-            user_q &= Q(is_active=is_active)
+            user_q &= Q(groups__name='Active Users')
 
         return UserModel._default_manager.filter(user_q)
