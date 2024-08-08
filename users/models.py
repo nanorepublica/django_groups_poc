@@ -12,6 +12,9 @@ class MyUserManager(UserManager):
         is_staff = extra_fields.pop('is_staff')
         user = super()._create_user(username, email, password, **extra_fields)
 
+        is_active_group = Group.objects.get(name='Active Users')
+        is_active_group.user_set.add(user)
+
         if is_superuser:
             is_superuser_group = Group.objects.get(name='is_superuser')
             is_superuser_group.user_set.add(user)
