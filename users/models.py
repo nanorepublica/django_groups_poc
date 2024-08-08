@@ -56,6 +56,10 @@ class User(AbstractBaseUser):
     def is_superuser(self):
         return self.groups.filter(name='is_superuser').exists()
 
+    @property
+    def is_active(self):
+        return self.groups.filter(name='Active Users').exists()
+
     def get_user_permissions(self, obj=None):
         """
         Return a list of permission strings that this user has directly.
