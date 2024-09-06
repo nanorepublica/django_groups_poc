@@ -12,6 +12,9 @@ class MyUserManager(UserManager):
         is_staff = extra_fields.pop('is_staff')
         user = super()._create_user(username, email, password, **extra_fields)
 
+        is_active_group = Group.objects.get(name='Active Users')
+        is_active_group.user_set.add(user)
+
         if is_superuser:
             is_superuser_group = Group.objects.get(name='is_superuser')
             is_superuser_group.user_set.add(user)
@@ -55,6 +58,10 @@ class User(AbstractBaseUser):
     @property
     def is_superuser(self):
         return self.groups.filter(name='is_superuser').exists()
+
+    @property
+    def is_active(self):
+        return self.groups.filter(name='Active Users').exists()
 
     def get_user_permissions(self, obj=None):
         """
