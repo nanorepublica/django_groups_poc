@@ -51,13 +51,19 @@ class User(AbstractBaseUser):
 
     objects = MyUserManager()
 
+    class Meta:
+        permissions = [
+            ('can_access_admin', 'Can access the admin'),
+            ('can_access_all_perms', 'Can access all permissions'),
+        ]
+
     @property
     def is_staff(self):
-        return self.groups.filter(name='is_staff').exists()
+        return self.has_perm('users.can_access_admin')
 
     @property
     def is_superuser(self):
-        return self.groups.filter(name='is_superuser').exists()
+        return self.has_perm('users.can_access_all_perms')
 
     @property
     def is_active(self):
@@ -90,11 +96,6 @@ class User(AbstractBaseUser):
         assumed to have permission in general. If an object is provided, check
         permissions for that object.
         """
-        # Active superusers have all permissions.
-        if self.is_active and self.is_superuser:
-            return True
-
-        # Otherwise we need to check the backends.
         return _user_has_perm(self, perm, obj)
 
     def has_perms(self, perm_list, obj=None):
@@ -111,10 +112,6 @@ class User(AbstractBaseUser):
         Return True if the user has any permissions in the given app label.
         Use similar logic as has_perm(), above.
         """
-        # Active superusers have all permissions.
-        if self.is_active and self.is_superuser:
-            return True
-
         return _user_has_module_perms(self, app_label)
 
 
